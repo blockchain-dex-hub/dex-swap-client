@@ -1,0 +1,47 @@
+modules = ["nodejs-20", "web"]
+run = "yarn run dev"
+hidden = [".config", ".git", "generated-icon.png", "node_modules", "dist"]
+
+[nix]
+channel = "stable-24_05"
+
+[deployment]
+deploymentTarget = "autoscale"
+run = ["sh", "-c", "yarn run dev"]
+
+[[ports]]
+localPort = 8000
+externalPort = 80
+
+[workflows]
+
+[[workflows.workflow]]
+name = "Project"
+mode = "parallel"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Start application"
+
+[[workflows.workflow]]
+name = "Start application"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run dev"
+waitForPort = 8000
+
+[[workflows.workflow]]
+name = "Development Server"
+author = 34558883
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "yarn"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "yarn run dev"
